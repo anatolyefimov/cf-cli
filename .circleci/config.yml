@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/anatolyefimov/cf-cli
+    steps:
+      - checkout
+      - run: go get
+      - run: go build
+  lint:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/anatolyefimov/cf-cli
+    steps:
+      - checkout
+      - run: go get
+      - run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.1
+      - run: golangci-lint run
+
+workflows:
+  version: 2
+  Building:
+    jobs: 
+      - build
+  Linting:
+    jobs:
+      - lint

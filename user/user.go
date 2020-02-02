@@ -9,9 +9,9 @@ import (
 type User struct {
 	handle    string
 	password  string
-	htaa      string
-	bfaa      string
-	client    *http.Client
+	ftaa      string // nolint
+	bfaa      string // nolint
+	Client    *http.Client
 	cookieJar *cookiejar.Jar
 }
 
@@ -22,7 +22,7 @@ func New(handle string, password string) User {
 		password: password,
 	}
 	user.cookieJar, _ = cookiejar.New(nil)
-	user.client = &http.Client{Jar: user.cookieJar}
+	user.Client = &http.Client{Jar: user.cookieJar}
 
 	return user
 }

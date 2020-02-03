@@ -1,37 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 
-	"github.com/anatolyefimov/cf-cli/user"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/anatolyefimov/cf-cli/cmd"
 )
 
 func main() {
 	args := os.Args[1:]
 	if args[0] == "login" {
-		fmt.Println("Enter handle:")
-		var handle string
-		fmt.Scan(&handle)
-		fmt.Println("Enter password:")
-		bytePassword, err := terminal.ReadPassword(0)
-
-		if err == nil {
-			user := user.New(handle, string(bytePassword))
-			user.Login()
-			resp, err := user.Client.Get("https://codeforces.com")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer resp.Body.Close()
-			html, _ := ioutil.ReadAll(resp.Body)
-			if user.IsLoggedIn(html) {
-				fmt.Printf("You are logged in as %s", handle)
-			}
-		}
+		cmd.Login()
 	}
 	// csrf, err = findCsrf(body)
 	// if err != nil {

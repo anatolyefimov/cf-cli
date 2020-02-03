@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"net/url"
 	"regexp"
+
+	"github.com/fatih/color"
 )
 
 func getCsrf(body []byte) (string, error) {
@@ -44,7 +46,7 @@ func (user *User) Login() {
 
 	resp, err := user.Client.Get("https://codeforces.com" + "/enter")
 	if err != nil {
-		return
+		log.Fatalln(err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -80,12 +82,13 @@ func (user *User) Login() {
 	if user.IsLoggedIn(html) {
 		user.bfaa = bfaa
 		user.bfaa = bfaa
+		color.Green("You are logged in as %s\n", user.handle)
 	} else {
 		re := regexp.MustCompile(`error for__password`)
 		if re.Match(html) {
-			log.Fatalln(`Invalid handle/email or password`)
+			color.Red(`Invalid handle/email or password`)
 		} else {
-			log.Fatalln(`Not logged in`)
+			fmt.Println(`Not logged in`)
 		}
 	}
 }

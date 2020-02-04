@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/anatolyefimov/cf-cli/utils"
 	"github.com/fatih/color"
 )
 
@@ -37,14 +38,14 @@ func getBfaa() string {
 
 //IsLoggedIn check whether the user is logged in
 func (user *User) IsLoggedIn(html []byte) bool {
-	re := regexp.MustCompile(fmt.Sprintf(`var handle = "%s"`, user.handle))
+	re := regexp.MustCompile(fmt.Sprintf(`var handle = "%s"`, user.Handle))
 	return re.Match(html)
 }
 
 // Login handler
 func (user *User) Login() {
 
-	resp, err := user.Client.Get("https://codeforces.com" + "/enter")
+	resp, err := user.Client.Get(utils.Host + "/enter")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -62,13 +63,13 @@ func (user *User) Login() {
 	ftaa := getFtaa()
 	bfaa := getBfaa()
 
-	resp, err = user.Client.PostForm("https://codeforces.com"+"/enter", url.Values{
+	resp, err = user.Client.PostForm(utils.Host+"/enter", url.Values{
 		"csrf_token":    {csrf},
 		"action":        {"enter"},
 		"ftaa":          {ftaa},
 		"bfaa":          {bfaa},
-		"handleOrEmail": {user.handle},
-		"password":      {user.password},
+		"handleOrEmail": {user.Handle},
+		"password":      {user.Password},
 		"_tta":          {"434"},
 		"remember":      {"on"},
 	})
@@ -80,9 +81,10 @@ func (user *User) Login() {
 	html, _ := ioutil.ReadAll(resp.Body)
 
 	if user.IsLoggedIn(html) {
-		user.bfaa = bfaa
-		user.bfaa = bfaa
-		color.Green("You are logged in as %s\n", user.handle)
+		user.Bfaa = bfaa
+		user.Ftaa = ftaa
+		color.Green("You are logged in as %s\n", user.Handle)
+		user.dump()
 	} else {
 		re := regexp.MustCompile(`error for__password`)
 		if re.Match(html) {

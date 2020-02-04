@@ -2,27 +2,27 @@ package user
 
 import (
 	"net/http"
-	"net/http/cookiejar"
+	"github.com/anatolyefimov/cf-cli/cookiejar"
 )
 
 //User class
 type User struct {
-	handle    string
-	password  string
-	ftaa      string // nolint
-	bfaa      string // nolint
-	Client    *http.Client
-	cookieJar *cookiejar.Jar
+	Handle    string         `json:"handle"`
+	Password  string         `json:"password"`
+	Ftaa      string         `json:"ftaa"`
+	Bfaa      string         `json:"bfaa"`
+	Client    *http.Client   `json:"-"`
+	CookieJar *cookiejar.Jar `json:"cookie"`
 }
 
 //New User
 func New(handle string, password string) User {
 	user := User{
-		handle:   handle,
-		password: password,
+		Handle:   handle,
+		Password: password,
 	}
-	user.cookieJar, _ = cookiejar.New(nil)
-	user.Client = &http.Client{Jar: user.cookieJar}
+	user.CookieJar, _ = cookiejar.New(nil)
+	user.Client = &http.Client{Jar: user.CookieJar}
 
 	return user
 }

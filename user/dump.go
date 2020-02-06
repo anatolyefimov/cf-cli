@@ -9,8 +9,9 @@ import (
 	"github.com/anatolyefimov/cf-cli/utils"
 )
 
-func (user *User) dump() {
-	user.Password = string(utils.Encrypt([]byte(user.Password), user.Handle+"666"))
+//Dump user info to disk
+func (user *User) Dump() {
+	user.Password = utils.Encrypt(user.Password, user.Handle+"666")
 	d, err := json.MarshalIndent(user, "", "  ")
 	if err != nil {
 		log.Fatalln(err)
@@ -25,25 +26,27 @@ func (user *User) dump() {
 	}
 }
 
-// func (user *User) fetch() {
-// 	homeDir, err := os.UserHomeDir()
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-// 	file, err := os.Open(homeDir + "/" + utils.DumpName)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-// 	defer file.Close()
+//Fetch user info from disk
+func (user *User) Fetch() {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	file, err := os.Open(homeDir + "/" + utils.DumpName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
 
-// 	d, err := ioutil.ReadAll(file)
+	d, err := ioutil.ReadAll(file)
 
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-// 	err = json.Unmarshal(d, user)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-// }
+	err = json.Unmarshal(d, user)
+	user.Password = utils.Decrypt(user.Password, user.Handle+"666")
+	if err != nil {
+		log.Fatalln(err)
+	}
+}

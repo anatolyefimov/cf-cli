@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+
 	"github.com/anatolyefimov/cf-cli/cookiejar"
 )
 
@@ -16,8 +17,8 @@ type User struct {
 }
 
 //New User
-func New(handle string, password string) User {
-	user := User{
+func New(handle string, password string) *User {
+	user := &User{
 		Handle:   handle,
 		Password: password,
 	}

@@ -37,7 +37,13 @@ func getBfaa() string {
 }
 
 //IsLoggedIn check whether the user is logged in
-func (user *User) IsLoggedIn(html []byte) bool {
+func (user *User) IsLoggedIn() bool {
+	resp, err := user.Client.Get(utils.Host)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	html, _ := ioutil.ReadAll(resp.Body)
 	re := regexp.MustCompile(fmt.Sprintf(`var handle = "%s"`, user.Handle))
 	return re.Match(html)
 }
@@ -80,17 +86,17 @@ func (user *User) Login() {
 	defer resp.Body.Close()
 	html, _ := ioutil.ReadAll(resp.Body)
 
-	if user.IsLoggedIn(html) {
+	if user.IsLoggedIn() {
 		user.Bfaa = bfaa
 		user.Ftaa = ftaa
 		color.Green("You are logged in as %s\n", user.Handle)
-		user.dump()
+		user.Dump()
 	} else {
 		re := regexp.MustCompile(`error for__password`)
 		if re.Match(html) {
 			color.Red(`Invalid handle/email or password`)
 		} else {
-			fmt.Println(`Not logged in`)
+			color.Red(`Not logged in`)
 		}
 	}
 }

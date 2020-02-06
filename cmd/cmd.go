@@ -2,8 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 
 	"github.com/anatolyefimov/cf-cli/user"
+	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -17,4 +21,31 @@ func Login() {
 	password := string(bytePassword)
 	user := user.New(handle, password)
 	user.Login()
+}
+
+//Submit to archive
+func Submit(problemID string, source string) {
+	user := user.New("", "")
+	user.Fetch()
+	if user.IsLoggedIn() {
+		err := os.Chdir(".")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		file, err := os.Open(source)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer file.Close()
+
+		sourceCode, err := ioutil.ReadAll(file)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+		user.Submit(problemID, string(sourceCode))
+
+	} else {
+		color.Red("Not loggen in")
+	}
 }

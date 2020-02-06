@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"io"
 )
 
@@ -15,7 +16,7 @@ func createHash(key string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func Encrypt(data []byte, passphrase string) []byte {
+func Encrypt(data string, passphrase string) string {
 	block, _ := aes.NewCipher([]byte(createHash(passphrase)))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
@@ -25,11 +26,17 @@ func Encrypt(data []byte, passphrase string) []byte {
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
 		panic(err.Error())
 	}
-	ciphertext := gcm.Seal(nonce, nonce, data, nil)
-	return ciphertext
+	ciphertext := gcm.Seal(nonce, nonce, []byte(data), nil)
+	return hex.EncodeToString(ciphertext)
 }
 
-func Decrypt(data []byte, passphrase string) []byte {
+func Decrypt(password string, passphrase string) string {
+
+	data, err := hex.DecodeString(password)
+	if err != nil {
+		fmt.Printf("Cannot decode the password")
+	}
+
 	key := []byte(createHash(passphrase))
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -43,7 +50,8 @@ func Decrypt(data []byte, passphrase string) []byte {
 	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		panic(err.Error())
+
+		panic(err)
 	}
-	return plaintext
+	return string(plaintext)
 }

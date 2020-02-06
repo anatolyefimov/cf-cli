@@ -7,10 +7,29 @@ import (
 )
 
 func main() {
+
+	// homeDir, err := os.UserHomeDir()
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// file, err := os.Open(homeDir + "/" + utils.DumpName)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// defer file.Close()
+	// user := user.New("", "")
+
+	// js, err := ioutil.ReadAll(file)
+	// _ = json.Unmarshal(js, user)
+	// // fmt.Println(utils.Decrypt([]byte(user.Password), user.Handle+"666"))
+	// fmt.Println(user.Handle + "666")
 	args := os.Args[1:]
 	if args[0] == "login" {
 		cmd.Login()
+	} else if args[0] == "submit" {
+		cmd.Submit(args[1], args[2])
 	}
+
 	// csrf, err = findCsrf(body)
 	// if err != nil {
 	// 	return

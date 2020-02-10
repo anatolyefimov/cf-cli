@@ -24,7 +24,7 @@ func Login() {
 }
 
 //Submit to archive
-func Submit(problemId string, source string) {
+func Submit(problemID string, source string) {
 	user := user.New("", "")
 	user.Fetch()
 	if user.IsLoggedIn() {
@@ -43,9 +43,17 @@ func Submit(problemId string, source string) {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		user.Submit(problemId, string(sourceCode))
+		user.Submit(problemID, string(sourceCode))
 
 	} else {
 		color.Red("Not loggen in")
 	}
+}
+
+//Enter to the contest
+func Enter(contestID string) {
+	user := user.New("", "")
+	user.Fetch()
+	user.Contest = contestID
+	user.Dump()
 }

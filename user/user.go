@@ -14,6 +14,7 @@ type User struct {
 	Bfaa      string         `json:"bfaa"`
 	Client    *http.Client   `json:"-"`
 	CookieJar *cookiejar.Jar `json:"cookie"`
+	Contest   string         `json:"contest"`
 }
 
 //New User
@@ -24,6 +25,7 @@ func New(handle string, password string) *User {
 	}
 	user.CookieJar, _ = cookiejar.New(nil)
 	user.Client = &http.Client{Jar: user.CookieJar}
+	user.Contest = "-1"
 
 	return user
 }

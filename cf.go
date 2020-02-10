@@ -20,6 +20,8 @@ func main() {
 		cmd.Login()
 	} else if args[0] == "submit" {
 		cmd.Submit(args[1], args[2])
+	} else if args[0] == "enter" {
+		cmd.Enter(args[1])
 	}
 
 }

@@ -4,17 +4,25 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/anatolyefimov/cf-cli/utils"
 	"github.com/fatih/color"
 )
 
-//Submit solution to archive
+//Submit solution
 func (user *User) Submit(problemID string, source string) {
-	resp, err := user.Client.Get(utils.Host + "problemset/submit")
+	var resp *http.Response
+	var err error
+	if user.Contest == "-1" {
+		resp, err = user.Client.Get(utils.Host + "problemset/submit")
+	} else {
+		resp, err = user.Client.Get(utils.Host + "contest/" + user.Contest + "/submit")
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -27,18 +35,34 @@ func (user *User) Submit(problemID string, source string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	resp, err = user.Client.PostForm(utils.Host+"problemset/submit?csrf_token="+csrf, url.Values{
-		"csrf_token":           {csrf},
-		"ftaa":                 {user.Ftaa},
-		"bfaa":                 {user.Bfaa},
-		"action":               {"submitSolutionFormSubmitted"},
-		"submittedProblemCode": {problemID},
-		"programTypeId":        {"50"},
-		"source":               {source},
-		"tabSize":              {"4"},
-		"sourceFile":           {},
-		"_tta":                 {"434"},
-	})
+	if user.Contest == "-1" {
+		resp, err = user.Client.PostForm(utils.Host+"problemset/submit?csrf_token="+csrf, url.Values{
+			"csrf_token":           {csrf},
+			"ftaa":                 {user.Ftaa},
+			"bfaa":                 {user.Bfaa},
+			"action":               {"submitSolutionFormSubmitted"},
+			"submittedProblemCode": {problemID},
+			"programTypeId":        {"50"},
+			"source":               {source},
+			"tabSize":              {"4"},
+			"sourceFile":           {},
+			"_tta":                 {"434"},
+		})
+	} else {
+		resp, err = user.Client.PostForm(utils.Host+"contest/"+user.Contest+"/submit?csrf_token="+csrf, url.Values{
+			"csrf_token":            {csrf},
+			"ftaa":                  {user.Ftaa},
+			"bfaa":                  {user.Bfaa},
+			"action":                {"submitSolutionFormSubmitted"},
+			"submittedProblemIndex": {problemID},
+			"programTypeId":         {"50"},
+			"source":                {source},
+			"tabSize":               {"4"},
+			"sourceFile":            {},
+			"_tta":                  {"434"},
+		})
+	}
+
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -78,14 +102,16 @@ func (user *User) Submit(problemID string, source string) {
 			if resv == nil || len(resv) <= 1 {
 				color.Red("Error: Verdict not found")
 			} else {
-				nt := resnt[1]
+				nnt, _ := strconv.Atoi(resnt[1])
+				nnt++
+				nt := strconv.Itoa(nnt)
 				verdict := resv[1]
 				if verdict != "TESTING" {
 					if verdict == "OK" {
 						g.Printf(utils.ReplaceOutput("OK"))
 					}
 					if verdict == "WRONG_ANSWER" {
-						r.Printf(utils.ReplaceOutput("Wront answer on " + nt))
+						r.Printf(utils.ReplaceOutput("Wrong answer on " + nt))
 					}
 					if verdict == "TIME_LIMIT_EXCEEDED" {
 						r.Printf(utils.ReplaceOutput("Time limit exceeded on" + nt))
@@ -93,7 +119,7 @@ func (user *User) Submit(problemID string, source string) {
 					if verdict == "COMPILATION_ERROR" {
 						r.Printf(utils.ReplaceOutput("Compilation error"))
 					}
-
+					fmt.Println()
 					break
 				}
 				if verdict == "TESTING" {

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/anatolyefimov/cf-cli/user"
+	"github.com/anatolyefimov/cf-cli/utils"
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -56,4 +57,9 @@ func Enter(contestID string) {
 	user.Fetch()
 	user.Contest = contestID
 	user.Dump()
+}
+
+//Help command
+func Help() {
+	fmt.Println(utils.Help)
 }

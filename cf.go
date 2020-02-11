@@ -22,6 +22,8 @@ func main() {
 		cmd.Submit(args[1], args[2])
 	} else if args[0] == "enter" {
 		cmd.Enter(args[1])
+	} else if args[0] == "help" {
+		cmd.Help()
 	}
 
 }

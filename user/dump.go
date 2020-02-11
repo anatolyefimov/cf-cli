@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/anatolyefimov/cf-cli/utils"
+	"github.com/fatih/color"
 )
 
 //Dump user info to disk
@@ -39,6 +40,10 @@ func (user *User) Fetch() {
 	defer file.Close()
 
 	d, err := ioutil.ReadAll(file)
+	if len(d) == 0 {
+		color.Red("Not logged in")
+		os.Exit(1)
+	}
 
 	if err != nil {
 		log.Fatalln(err)

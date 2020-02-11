@@ -1,4 +1,7 @@
 # Codeforces command-line interface
+ [![anatolyefimov](https://circleci.com/gh/anatolyefimov/cf-cli.svg?style=svg)]()
+
+
 ## Install
 ```
 $ export PATH=$PATH:$(go env GOBIN)
